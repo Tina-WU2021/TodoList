@@ -12,6 +12,8 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
   const [editDeadline, setEditDeadline] = useState('');
+  const [editPrioritized, setEditPrioritized] = useState(false);
+  const [editSettled, setEditSettled] = useState(false);
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'completed'
 
   // Load todos from localStorage on mount
@@ -35,7 +37,9 @@ function App() {
         text: inputValue.trim(),
         completed: false,
         deadline: deadlineValue || null,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        prioritized: false,
+        settled: false,
       };
       setTodos([...todos, newTodo]);
       setInputValue('');
@@ -51,14 +55,28 @@ function App() {
     ));
   };
 
+  const togglePrioritized = (id) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, prioritized: !todo.prioritized, settled: false } : todo
+    ));
+  };
+
+  const toggleSettled = (id) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, settled: !todo.settled, prioritized: false } : todo
+    ));
+  };
+
   const deleteTodo = (id) => {
     setTodos(todos.filter(todo => todo.id !== id));
   };
 
-  const startEditing = (id, text, deadline) => {
+  const startEditing = (id, text, deadline, prioritized, settled) => {
     setEditingId(id);
     setEditText(text);
     setEditDeadline(deadline || '');
+    setEditPrioritized(prioritized);
+    setEditSettled(settled);
   };
 
   const saveEdit = (id) => {
@@ -67,12 +85,16 @@ function App() {
         todo.id === id ? { 
           ...todo, 
           text: editText.trim(),
-          deadline: editDeadline || null
+          deadline: editDeadline || null,
+          prioritized: editPrioritized,
+          settled: editSettled
         } : todo
       ));
       setEditingId(null);
       setEditText('');
       setEditDeadline('');
+      setEditPrioritized(false);
+      setEditSettled(false);
     }
   };
 
@@ -80,11 +102,9 @@ function App() {
     setEditingId(null);
     setEditText('');
     setEditDeadline('');
+    setEditPrioritized(false);
+    setEditSettled(false);
   };
-
-  // const getActiveCount = () => {
-  //   return todos.filter(todo => !todo.completed).length;
-  // };
 
   const getCompletedCount = () => {
     return todos.filter(todo => todo.completed).length;
@@ -106,25 +126,30 @@ function App() {
     });
   };
 
-  // Sort todos by deadline (earlier deadline first)
-  // Tasks without deadline are placed at the end
+  // Sort todos with priority: Prioritized > Normal (by date) > Settled
   const getSortedTodos = (completedStatus) => {
     const filteredTodos = todos.filter(todo => todo.completed === completedStatus);
     return [...filteredTodos].sort((a, b) => {
-      // If both have deadlines, compare dates
+      // Prioritized tasks come first
+      if (a.prioritized && !b.prioritized) return -1;
+      if (!a.prioritized && b.prioritized) return 1;
+      
+      // Settled tasks come last
+      if (a.settled && !b.settled) return 1;
+      if (!a.settled && b.settled) return -1;
+      
+      // For non-prioritized and non-settled tasks, sort by deadline
       if (a.deadline && b.deadline) {
         return new Date(a.deadline) - new Date(b.deadline);
       }
-      // If only a has deadline, a comes first
       if (a.deadline) return -1;
-      // If only b has deadline, b comes first
       if (b.deadline) return 1;
-      // If neither has deadline, sort by creation date (oldest first)
+      
+      // Sort by creation date if no deadlines
       return new Date(a.createdAt) - new Date(b.createdAt);
     });
   };
 
-  // const activeCount = getActiveCount();
   const completedCount = getCompletedCount();
   const activeTodos = getSortedTodos(false);
   const completedTodos = getSortedTodos(true);
@@ -140,7 +165,6 @@ function App() {
           >
             <span className="tab-icon">📝</span>
             <span className="tab-text">Todo List</span>
-            {/* {activeCount > 0 && <span className="tab-count active-count">{activeCount}</span>} */}
           </button>
           <button 
             className={`header-tab-btn ${activeTab === 'completed' ? 'active' : ''}`}
@@ -148,7 +172,6 @@ function App() {
           >
             <span className="tab-icon">✅</span>
             <span className="tab-text">Completed</span>
-            {/* {completedCount > 0 && <span className="tab-count completed-count">{completedCount}</span>} */}
           </button>
         </div>
       </div>
@@ -197,9 +220,11 @@ function App() {
                 <table className="todo-table">
                   <thead>
                     <tr>
-                      <th className="checkbox-column"></th>
+                      <th className="checkbox-column">Done</th>
                       <th className="task-column">Task</th>
                       <th className="deadline-column">Deadline</th>
+                      <th className="priority-column">Priority</th>
+                      <th className="settled-column">Settled</th>
                       <th className="actions-column">Actions</th>
                     </tr>
                   </thead>
@@ -208,13 +233,14 @@ function App() {
                       const isTaskOverdue = isOverdue(todo.deadline, todo.completed);
                       
                       return (
-                        <tr key={todo.id} className={`todo-row ${isTaskOverdue ? 'overdue-row' : ''}`}>
+                        <tr key={todo.id} className={`todo-row ${isTaskOverdue ? 'overdue-row' : ''} ${todo.prioritized ? 'prioritized-row' : ''} ${todo.settled ? 'settled-row' : ''}`}>
                           <td className="checkbox-cell">
                             <input
                               type="checkbox"
                               checked={todo.completed}
                               onChange={() => toggleTodo(todo.id)}
                               className="todo-checkbox"
+                              title="Mark as completed"
                             />
                           </td>
                           
@@ -236,9 +262,33 @@ function App() {
                                     onChange={(e) => setEditDeadline(e.target.value)}
                                     className="edit-deadline-input"
                                   />
+                                  <div className="edit-flags">
+                                    <label className="edit-priority-label">
+                                      <input
+                                        type="checkbox"
+                                        checked={editPrioritized}
+                                        onChange={(e) => {
+                                          setEditPrioritized(e.target.checked);
+                                          if (e.target.checked) setEditSettled(false);
+                                        }}
+                                      />
+                                      Prioritized
+                                    </label>
+                                    <label className="edit-settled-label">
+                                      <input
+                                        type="checkbox"
+                                        checked={editSettled}
+                                        onChange={(e) => {
+                                          setEditSettled(e.target.checked);
+                                          if (e.target.checked) setEditPrioritized(false);
+                                        }}
+                                      />
+                                      Settled
+                                    </label>
+                                  </div>
                                 </div>
                               </td>
-                              <td className="edit-actions-cell">
+                              <td className="edit-actions-cell" colSpan="3">
                                 <button onClick={() => saveEdit(todo.id)} className="save-button">Save</button>
                                 <button onClick={cancelEdit} className="cancel-button">Cancel</button>
                               </td>
@@ -248,7 +298,7 @@ function App() {
                               <td className={`task-cell ${isTaskOverdue ? 'overdue-text' : ''}`}>
                                 <span 
                                   className="task-text"
-                                  onDoubleClick={() => startEditing(todo.id, todo.text, todo.deadline)}
+                                  onDoubleClick={() => startEditing(todo.id, todo.text, todo.deadline, todo.prioritized, todo.settled)}
                                 >
                                   {todo.text}
                                 </span>
@@ -262,10 +312,30 @@ function App() {
                                   <span className="no-deadline">No deadline</span>
                                 )}
                               </td>
+                              <td className="priority-cell">
+                                <input
+                                  type="checkbox"
+                                  checked={todo.prioritized}
+                                  onChange={() => togglePrioritized(todo.id)}
+                                  className="priority-checkbox"
+                                  title="Prioritize task (moves to top)"
+                                  disabled={todo.settled}
+                                />
+                              </td>
+                              <td className="settled-cell">
+                                <input
+                                  type="checkbox"
+                                  checked={todo.settled}
+                                  onChange={() => toggleSettled(todo.id)}
+                                  className="settled-checkbox"
+                                  title="Settle task (moves to bottom)"
+                                  disabled={todo.prioritized}
+                                />
+                              </td>
                               <td className="actions-cell">
                                 <div className="action-buttons">
                                   <button 
-                                    onClick={() => startEditing(todo.id, todo.text, todo.deadline)}
+                                    onClick={() => startEditing(todo.id, todo.text, todo.deadline, todo.prioritized, todo.settled)}
                                     className="edit-button"
                                   >
                                     ✏️ Edit
@@ -307,7 +377,7 @@ function App() {
                 <table className="todo-table completed-table">
                   <thead>
                     <tr>
-                      <th className="checkbox-column"></th>
+                      <th className="checkbox-column">Done</th>
                       <th className="task-column">Task</th>
                       <th className="deadline-column">Deadline</th>
                       <th className="actions-column">Actions</th>
@@ -356,7 +426,7 @@ function App() {
                               <td className="task-cell completed-task-text">
                                 <span 
                                   className="task-text"
-                                  onDoubleClick={() => startEditing(todo.id, todo.text, todo.deadline)}
+                                  onDoubleClick={() => startEditing(todo.id, todo.text, todo.deadline, todo.prioritized, todo.settled)}
                                 >
                                   {todo.text}
                                 </span>
@@ -373,7 +443,7 @@ function App() {
                               <td className="actions-cell">
                                 <div className="action-buttons">
                                   <button 
-                                    onClick={() => startEditing(todo.id, todo.text, todo.deadline)}
+                                    onClick={() => startEditing(todo.id, todo.text, todo.deadline, todo.prioritized, todo.settled)}
                                     className="edit-button"
                                   >
                                     ✏️ Edit

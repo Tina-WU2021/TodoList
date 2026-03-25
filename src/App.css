@@ -26,19 +26,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  animation: slideDown 0.5s ease;
   padding: 20px 0;
-}
-
-@keyframes slideDown {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 /* Centered Tabs Container */
@@ -55,84 +43,35 @@ body {
 /* Header Tabs */
 .header-tab-btn {
   padding: 12px 32px;
-  background: transparent;
+  background: #f5f5f5;
   border: none;
   border-radius: 50px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 10px;
-  position: relative;
-  overflow: hidden;
-  background: #f5f5f5;
 }
 
-.header-tab-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 0;
-}
-
-.header-tab-btn:hover::before {
-  opacity: 0.1;
+.header-tab-btn:hover {
+  transform: translateY(-2px);
+  background: #e8e8e8;
 }
 
 .header-tab-btn.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-  transform: translateY(-2px);
-}
-
-.header-tab-btn.active .tab-count {
-  background: rgba(255, 255, 255, 0.3);
-  color: white;
 }
 
 .tab-icon {
   font-size: 1.2rem;
-  position: relative;
-  z-index: 1;
 }
 
 .tab-text {
-  position: relative;
-  z-index: 1;
-}
-
-.tab-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 8px;
-  border-radius: 20px;
-  font-size: 12px;
   font-weight: 600;
-  position: relative;
-  z-index: 1;
-  transition: all 0.3s ease;
-}
-
-.active-count {
-  background: rgba(102, 126, 234, 0.2);
-  color: #667eea;
-}
-
-.completed-count {
-  background: rgba(40, 167, 69, 0.2);
-  color: #28a745;
 }
 
 /* Main Container */
@@ -143,18 +82,6 @@ body {
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   padding: 30px;
-  animation: fadeInUp 0.6s ease;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Form Styles */
@@ -242,10 +169,6 @@ body {
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
-.add-button:active {
-  transform: translateY(0);
-}
-
 .button-icon {
   font-size: 1.2rem;
   font-weight: bold;
@@ -260,15 +183,6 @@ body {
   padding: 10px 0;
 }
 
-.active-tasks-count {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
 .completed-tasks-count {
   background: #28a745;
   color: white;
@@ -276,27 +190,6 @@ body {
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
-}
-
-.clear-all-button {
-  padding: 8px 20px;
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.clear-all-button:hover {
-  background: #c82333;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
 /* Table Styles */
@@ -330,15 +223,21 @@ body {
 }
 
 .checkbox-column {
-  width: 50px;
+  width: 60px;
 }
 
 .task-column {
-  min-width: 200px;
+  min-width: 250px;
 }
 
 .deadline-column {
   width: 150px;
+}
+
+.priority-column,
+.settled-column {
+  width: 80px;
+  text-align: center;
 }
 
 .actions-column {
@@ -352,7 +251,6 @@ body {
 }
 
 .todo-row:hover {
-  background: #f8f9fa;
   transform: scale(1.01);
 }
 
@@ -421,12 +319,12 @@ body {
   border-radius: 8px;
   color: #666;
   font-size: 13px;
+  transition: all 0.3s ease;
 }
 
 .overdue-date {
   background: #ffe8e8;
   color: #dc3545;
-  animation: pulse 2s infinite;
 }
 
 .completed-deadline {
@@ -445,21 +343,146 @@ body {
   display: inline-block;
 }
 
-@keyframes pulse {
+/* Priority and Settled Checkbox Styles */
+.priority-cell,
+.settled-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.priority-checkbox,
+.settled-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.priority-checkbox {
+  accent-color: #ffc107;
+}
+
+.priority-checkbox:checked {
+  transform: scale(1.1);
+}
+
+.settled-checkbox {
+  accent-color: #4caf50;
+}
+
+.settled-checkbox:checked {
+  transform: scale(1.1);
+}
+
+.priority-checkbox:disabled,
+.settled-checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Row styling - Full row colors */
+.prioritized-row {
+  background: #ffe8e8 !important;
+  border-left: 4px solid #ffc107;
+  animation: priorityPulse 3s ease-in-out infinite;
+}
+
+@keyframes priorityPulse {
   0%, 100% {
-    opacity: 1;
+    background: #ffe8e8;
   }
   50% {
-    opacity: 0.7;
+    background: #ffdddd;
   }
 }
 
-/* Action Buttons - In One Line */
+.prioritized-row:hover {
+  background: #ffdddd !important;
+}
+
+.settled-row {
+  background: #e8f5e9 !important;
+  border-left: 4px solid #4caf50;
+}
+
+.settled-row:hover {
+  background: #c8e6c9 !important;
+}
+
+/* Deadline styling for priority and settled tasks */
+.prioritized-row .deadline-date {
+  background: #ffd4d4 !important;
+  color: #c62828 !important;
+  border: 1px solid rgba(198, 40, 40, 0.2);
+  font-weight: 500;
+}
+
+.settled-row .deadline-date {
+  background: #c8e6c9 !important;
+  color: #2e7d32 !important;
+  border: 1px solid rgba(46, 125, 50, 0.2);
+  font-weight: 500;
+}
+
+.prioritized-row .no-deadline {
+  background: #ffd4d4 !important;
+  color: #c62828 !important;
+  font-weight: 500;
+}
+
+.settled-row .no-deadline {
+  background: #c8e6c9 !important;
+  color: #2e7d32 !important;
+  font-weight: 500;
+}
+
+.prioritized-row .overdue-date {
+  background: #ffc9c9 !important;
+  color: #c62828 !important;
+  border: 1px solid #c62828;
+}
+
+/* Action Buttons */
 .action-buttons {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
   align-items: center;
+}
+
+.edit-button,
+.delete-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.edit-button {
+  background: #ffc107;
+  color: #333;
+}
+
+.edit-button:hover {
+  background: #e0a800;
+  transform: translateY(-1px);
+}
+
+.delete-button {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-button:hover {
+  background: #c82333;
+  transform: translateY(-1px);
 }
 
 /* Edit Form */
@@ -492,13 +515,47 @@ body {
   cursor: pointer;
 }
 
+.edit-flags {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.edit-priority-label,
+.edit-settled-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.edit-priority-label:hover {
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.edit-settled-label:hover {
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.edit-priority-label input,
+.edit-settled-label input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
 .edit-actions-cell {
   padding: 8px !important;
   white-space: nowrap;
 }
 
-/* Button Styles */
-.save-button, .cancel-button, .edit-button, .delete-button {
+.save-button,
+.cancel-button {
   padding: 6px 12px;
   border: none;
   border-radius: 8px;
@@ -509,7 +566,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  white-space: nowrap;
+  margin-left: 5px;
 }
 
 .save-button {
@@ -532,46 +589,15 @@ body {
   transform: translateY(-1px);
 }
 
-.edit-button {
-  background: #ffc107;
-  color: #333;
-}
-
-.edit-button:hover {
-  background: #e0a800;
-  transform: translateY(-1px);
-}
-
-.delete-button {
-  background: #dc3545;
-  color: white;
-}
-
-.delete-button:hover {
-  background: #c82333;
-  transform: translateY(-1px);
-}
-
 /* Empty State */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  animation: fadeIn 0.5s ease;
 }
 
 .empty-state-icon {
   font-size: 4rem;
   margin-bottom: 20px;
-  animation: bounce 1s ease infinite;
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
 }
 
 .empty-message {
@@ -606,78 +632,65 @@ body {
   background: #555;
 }
 
-/* ==================== */
-/* ENHANCED MOBILE VIEW - FULL WIDTH TASKS */
-/* ==================== */
+/* Tooltip styles */
+[title] {
+  position: relative;
+  cursor: help;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  /* Container adjustments */
   .todo-container {
     margin: 20px 15px;
     padding: 20px 15px;
-    width: auto;
   }
-  
-  /* Header tabs */
+
   .header-tabs-container {
     gap: 12px;
     padding: 0 15px;
   }
-  
+
   .header-tab-btn {
     flex: 1;
     justify-content: center;
     padding: 10px 20px;
-    min-width: 0;
   }
-  
+
   .tab-text {
-    display: inline-block;
     font-size: 14px;
   }
-  
-  .tab-icon {
-    font-size: 1.1rem;
-  }
-  
-  /* Form - full width */
+
   .form-group {
     flex-direction: column;
     width: 100%;
     gap: 12px;
   }
-  
+
   .todo-input,
   .deadline-wrapper,
   .add-button {
     width: 100%;
   }
-  
+
   .add-button {
     justify-content: center;
   }
-  
-  /* Table header info */
+
   .table-header-info {
     flex-direction: column;
     gap: 12px;
     align-items: stretch;
   }
-  
-  .active-tasks-count,
+
   .completed-tasks-count {
     text-align: center;
   }
-  
-  .clear-all-button {
-    justify-content: center;
-    width: 100%;
-  }
-  
+
   /* Hide table headers on mobile */
   .todo-table thead {
     display: none;
   }
-  
+
   /* Make each task a full-width card */
   .todo-table,
   .todo-table tbody,
@@ -686,25 +699,17 @@ body {
     display: block;
     width: 100%;
   }
-  
+
   .todo-row {
     display: block;
     width: 100%;
     margin-bottom: 16px;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
-    background: white;
     padding: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
   }
-  
-  .todo-row:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Style each cell as a row in the card */
+
   .todo-row td {
     display: flex;
     align-items: center;
@@ -713,185 +718,179 @@ body {
     border: none;
     width: 100%;
   }
-  
-  /* Checkbox cell */
+
   .checkbox-cell {
     order: 1;
     justify-content: flex-start;
     padding-top: 0;
   }
-  
+
   .todo-checkbox {
     width: 24px;
     height: 24px;
   }
-  
-  /* Task cell */
+
   .task-cell {
     order: 2;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .task-text {
     font-size: 16px;
     font-weight: 500;
     flex: 1;
-    word-break: break-word;
   }
-  
-  /* Deadline cell */
+
   .deadline-cell {
     order: 3;
     justify-content: flex-start;
     padding-left: 0;
   }
-  
-  .deadline-date,
-  .no-deadline {
-    font-size: 13px;
-    padding: 6px 12px;
-  }
-  
-  /* Actions cell */
-  .actions-cell {
+
+  .priority-cell {
     order: 4;
+    display: inline-flex;
+    width: auto;
+    margin-right: 10px;
+  }
+
+  .settled-cell {
+    order: 5;
+    display: inline-flex;
+    width: auto;
+    margin-right: 10px;
+  }
+
+  .actions-cell {
+    order: 6;
     justify-content: flex-end;
     padding-left: 0;
     padding-bottom: 0;
   }
-  
+
   .action-buttons {
     width: 100%;
     justify-content: flex-end;
     gap: 12px;
   }
-  
-  .edit-button,
-  .delete-button {
-    padding: 8px 16px;
-    font-size: 13px;
+
+  .priority-checkbox,
+  .settled-checkbox {
+    width: 22px;
+    height: 22px;
   }
-  
-  /* Edit mode styling */
+
+  /* Mobile row colors */
+  .prioritized-row {
+    background: #ffe8e8 !important;
+  }
+
+  .settled-row {
+    background: #e8f5e9 !important;
+  }
+
+  /* Edit form mobile */
   .edit-task-cell {
     display: block !important;
     width: 100%;
     padding: 0 !important;
   }
-  
+
   .edit-form {
     flex-direction: column;
     width: 100%;
     gap: 10px;
   }
-  
+
   .edit-input,
   .edit-deadline-input {
     width: 100%;
     padding: 10px 12px;
-    font-size: 14px;
   }
-  
+
+  .edit-flags {
+    justify-content: center;
+    width: 100%;
+  }
+
   .edit-actions-cell {
     display: block !important;
     width: 100%;
     text-align: center;
     padding: 10px 0 0 0 !important;
   }
-  
+
   .save-button,
   .cancel-button {
     padding: 8px 16px;
     margin: 0 4px;
   }
-  
-  /* Overdue styling */
+
   .overdue-row {
     border-left: 4px solid #dc3545;
   }
-  
-  /* Completed row styling */
-  .completed-row {
-    opacity: 0.85;
-    background: #fafafa;
+
+  .prioritized-row {
+    border-left: 4px solid #ffc107;
   }
-  
-  /* Empty state */
+
+  .settled-row {
+    border-left: 4px solid #4caf50;
+  }
+
   .empty-state {
     padding: 40px 20px;
   }
-  
+
   .empty-state-icon {
     font-size: 3rem;
   }
-  
-  .empty-message {
-    font-size: 16px;
-  }
-  
-  .empty-submessage {
-    font-size: 13px;
-  }
 }
 
-/* Small mobile devices (up to 480px) */
 @media (max-width: 480px) {
   .todo-container {
     margin: 15px 12px;
     padding: 15px 12px;
   }
-  
+
   .header-tab-btn {
     padding: 8px 16px;
   }
-  
+
   .tab-text {
     font-size: 13px;
   }
-  
+
   .tab-icon {
     font-size: 1rem;
   }
-  
+
   .todo-row {
     padding: 14px;
     margin-bottom: 14px;
   }
-  
+
   .task-text {
     font-size: 15px;
   }
-  
+
   .deadline-date,
   .no-deadline {
     font-size: 12px;
     padding: 4px 10px;
   }
-  
+
   .edit-button,
   .delete-button {
     padding: 6px 12px;
     font-size: 12px;
   }
-  
-  .action-buttons {
-    gap: 8px;
-  }
-}
 
-/* Landscape mode */
-@media (max-width: 768px) and (orientation: landscape) {
-  .todo-table-container {
-    max-height: 400px;
-  }
-  
-  .todo-row {
-    padding: 12px;
-  }
-  
-  .task-text {
-    font-size: 14px;
+  .priority-checkbox,
+  .settled-checkbox {
+    width: 20px;
+    height: 20px;
   }
 }
